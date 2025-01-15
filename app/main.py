@@ -68,13 +68,19 @@ def get_posts(db: Session = Depends(get_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post):
+def create_posts(post: Post, db: Session = Depends(get_db)):
     # Try to always use %s. This way we are able to sanitize inputs. By puttting our values as a second argument to our execute
-    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
-                   (post.title, post.content, post.published))
-    new_post = cursor.fetchone()
+    # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
+    # (post.title, post.content, post.published))
+    # new_post = cursor.fetchone()
     # Commit the changes when submitting data to the database.
-    conn.commit()
+    # conn.commit()
+    new_post = models.Post(
+        title=post.title, content=post.content, published=post.published)
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+
     return {"data": new_post}
 
 
