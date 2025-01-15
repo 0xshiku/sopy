@@ -52,15 +52,21 @@ def root():
 
 @app.get("/posts")
 def get_posts():
-    return {"data": my_posts}
+    cursor.execute(""" SELECT * FROM posts """)
+    posts = cursor.fetchall()
+    print(posts)
+    return {"data": posts}
 
 
-@app.post("/createposts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post):
-    post_dict = post.dict()
-    post_dict['id'] = randrange(0, 100000)
-    my_posts.append()
-    return {"data": post_dict}
+    # Try to always use %s. This way we are able to sanitize inputs. By puttting our values as a second argument to our execute
+    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
+                   (post.title, post.content, post.published))
+    new_post = cursor.fetchone()
+    # Commit the changes when submitting data to the database.
+    conn.commit()
+    return {"data": new_post}
 
 
 @app.get("/posts/{id}")
