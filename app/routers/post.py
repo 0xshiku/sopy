@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/posts",
+    tags=['Posts']
+)
 
 
 @router.get("/posts", response_model=List[schemas.Post])
@@ -16,7 +19,7 @@ def get_posts(db: Session = Depends(get_db)):
     return posts
 
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # Try to always use %s. This way we are able to sanitize inputs. By puttting our values as a second argument to our execute
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
@@ -33,7 +36,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     return new_post
 
 
-@router.get("/posts/{id}", response_model=schemas.Post)
+@router.get("/{id}", response_model=schemas.Post)
 def get_post(id: int, db: Session = Depends(get_db)):
     # post = find_post(id)
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (str(id)))
@@ -46,7 +49,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute(
     # """ DELETE FROM posts WHERE id = %s RETURNING *""", (str(id),))
@@ -65,7 +68,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.put("/posts/{id}", response_model=schemas.Post)
+@router.put("/{id}", response_model=schemas.Post)
 def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
     # (post.title, post.content, post.published, str(id)))
