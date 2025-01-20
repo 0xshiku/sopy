@@ -34,7 +34,8 @@ def verify_access_token(token: str, credentials_exception):
             raise credentials_exception
 
         token_data = schemas.TokendData(id=id)
-    except JWTError:
+    except JWTError as e:
+        print(e)
         raise credentials_exception
 
     return token_data
