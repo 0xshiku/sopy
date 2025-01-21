@@ -28,8 +28,8 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
     # Commit the changes when submitting data to the database.
     # conn.commit()
     print(current_user.email)
-    new_post = models.Post(
-        title=post.title, content=post.content, published=post.published)
+    new_post = models.Post(owner_id=current_user.id,
+                           title=post.title, content=post.content, published=post.published)
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
