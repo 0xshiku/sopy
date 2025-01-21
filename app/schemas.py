@@ -16,6 +16,7 @@ class PostCreate(PostBase):
 class Post(BaseModel):
     id: int
     create_at: datetime
+    owner_id: int
 
     class Config:
         orm_mode = True
