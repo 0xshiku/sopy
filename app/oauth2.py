@@ -4,14 +4,15 @@ from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from . import schemas, database, models
 from sqlalchemy.orm import Session
+from .config import settings
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 # To get a random key like this run: openssl rand -hex 32
-SECRET_KEY = "b6b801fba5e3deb719a36216c211f5aa187e46a0019b742bf7b18c97bf0a1092"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 
 def create_access_token(data: dict):
