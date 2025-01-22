@@ -38,6 +38,11 @@ class Post(BaseModel):
         orm_mode = True
 
 
+class PostOut(PostBase):
+    Post: Post
+    votes: int
+
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
