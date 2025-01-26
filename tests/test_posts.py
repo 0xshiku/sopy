@@ -28,3 +28,22 @@ def test_get_one_post(authorized_client, test_posts):
     assert post.Post.id == test_posts[0].id
     assert post.Post.content == test_posts[0].content
     assert post.Post.title == test_posts[0].title
+
+
+def test_create_post_default_published_true(authorized_client, test_user, test_posts):
+    res = authorized_client.post(
+        "/posts/", json={"title": "arbitrary title", "content": "asdasd"})
+
+    created_post = schemas.Post(**res.json())
+    assert res.status_code == 201
+    assert created_post.title == "arbitrary title"
+    assert created_post.content == "asdasdsad"
+    assert created_post.published == True
+    assert created_post.owner_id == test_user['id']
+
+
+def test_unauthorized_user_create_posts(client, test_user, test_posts):
+    res = client.post(
+        "/posts/", json={"title": "arbitrary title", "content": "asdasdas"}
+    )
+    assert res.status_code == 401
