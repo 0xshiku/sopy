@@ -4,7 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from app.main import app
-from app.config import settings
+from app.config import setings
+from app import models
 from app.database import get_db
 from app.database import Base
 
@@ -36,3 +37,36 @@ def client(session):
             session.close()
     app.dependecy_overrides[get_db] = override_get_db()
     yield TestClient(app)
+
+
+@pytest.fixture
+def authorized_client(client, token):
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token}"
+    }
+
+    return client
+
+
+@pytest.fixture
+def test_posts(test_user, session):
+    posts_data = [
+        {
+            "title": "1st title",
+            "content": "1st content",
+            "owner_id": test_user['id'],
+        }
+    ]
+
+    def create_post_model(post):
+        return models.Post(**post)
+
+    post_map = map(create_post_model, posts_data)
+    posts = list(post_map)
+
+    session.add_all(posts)
+    session.commit()
+
+    posts = session.query(models.Post).all()
+    return posts
